@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje a Granada, Sevilla y Córdoba</title>
+    <!-- Incluyendo Tailwind CSS para estilos rápidos y modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos adicionales para un efecto sutil al pasar el ratón */
+        .photo-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Asegurar que las imágenes carguen suavemente */
+        img {
+            transition: opacity 0.5s ease-in-out;
+        }
+        img[loading] {
+            opacity: 0;
+        }
+        img.loaded {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Encabezado de la página -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mb-4">
+                Viaje de Granada, Sevilla y Córdoba
+            </h1>
+            <p class="text-xl text-gray-500 italic">
+                Fotos por Ariel Capdevila
+            </p>
+        </div>
+    </header>
+
+    <!-- Contenido principal: Galería de fotos -->
+    <main class="flex-grow max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 w-full">
+        <!-- Grid adaptable: 1 columna en móvil, 2 en tablet, 3 en escritorio -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="gallery-container">
+            <!-- Las imágenes se insertarán aquí dinámicamente mediante JavaScript -->
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            &copy; 2026 Ariel Capdevila. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <script>
+        // Lista de nombres de archivos de fotos proporcionada
+        // He limpiado la lista para separar correctamente los archivos que venían pegados
+        // y asegurado que sean strings separados.
+        const photoFilenames = [
+            "PXL_20260508_095015759.MP.jpg",
+            "PXL_20260508_093934021.PANO.jpg",
+            "PXL_20260508_093705949.PANO.jpg", 
+            "PXL_20260508_093657441.MP.jpg",
+            "PXL_20260508_092321816.MP.jpg",
+            "PXL_20260508_091943629.PANO.jpg",
+            "PXL_20260508_090447208.MP.jpg",
+            "PXL_20260507_130513808.MP.jpg",
+            "PXL_20260507_112540074.MP.jpg",
+            "PXL_20260507_110403628.MP.jpg",
+            // Los siguientes 4 parecen repetidos en la solicitud original, pero los mantengo
+            // por si acaso, aunque normalmente se eliminarían duplicados.
+            "PXL_20260508_090447208.MP.jpg", 
+            "PXL_20260507_130513808.MP.jpg",
+            "PXL_20260507_112540074.MP.jpg",
+            "PXL_20260507_110403628.MP.jpg",
+            "PXL_20260507_102747094.MP.jpg",
+            "PXL_20260507_102545234.MP.jpg",
+            "PXL_20260507_101945365.MP.jpg",
+            "PXL_20260505_093459700.MP~2.jpg",
+            "PXL_20260505_092908379.MP.jpg",
+            "PXL_20260505_091513304.MP.jpg",
+            "PXL_20260505_091231719.MP.jpg",
+            "PXL_20260505_085837433.MP.jpg",
+            "PXL_20260505_081340102.MP.jpg",
+            "PXL_20260505_082307518.MP.jpg"
+        ];
+
+        // URL base donde se alojan las imágenes
+        // Nota: La ruta original indicada era .png, pero los archivos son .jpg. 
+        // Uso la ruta base asumiendo que los archivos están en esa carpeta.
+        const baseUrl = "https://logise1.github.io/photos/";
+
+        // Eliminar duplicados para no mostrar la misma foto dos veces
+        const uniquePhotos = [...new Set(photoFilenames)];
+
+        // Referencia al contenedor de la galería
+        const galleryContainer = document.getElementById('gallery-container');
+
+        // Función para renderizar las imágenes
+        function renderGallery() {
+            uniquePhotos.forEach(filename => {
+                // Crear el elemento contenedor de la foto (tarjeta)
+                const card = document.createElement('div');
+                card.className = 'photo-card bg-white rounded-2xl overflow-hidden shadow-md aspect-w-4 aspect-h-3 sm:aspect-w-1 sm:aspect-h-1 relative bg-gray-200';
+                
+                // Construir la URL completa de la imagen
+                // Reemplazar la extensión .png solicitada erróneamente en el prompt por la real .jpg
+                // Si realmente están guardadas como .png a pesar del nombre, habría que cambiar esto
+                const imageUrl = `${baseUrl}${filename}`;
+
+                // Crear el elemento imagen
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = `Foto de viaje: ${filename}`;
+                img.loading = "lazy"; // Carga diferida para mejorar el rendimiento
+                img.className = 'object-cover w-full h-full absolute inset-0';
+                
+                // Efecto de carga suave
+                img.onload = function() {
+                    this.classList.add('loaded');
+                };
+
+                // Manejo de errores por si la imagen no existe
+                img.onerror = function() {
+                    this.src = `https://placehold.co/600x400/eeeeee/999999?text=Imagen+No+Encontrada\n${filename}`;
+                    this.alt = "Imagen no encontrada";
+                    this.classList.add('loaded');
+                };
+
+                // Añadir un pequeño pie de foto opcional visible al hacer hover (opcional, lo dejo comentado)
+                /*
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-opacity duration-300 flex items-end p-4 opacity-0 hover:opacity-100';
+                const filenameText = document.createElement('p');
+                filenameText.className = 'text-white text-xs truncate w-full';
+                filenameText.textContent = filename;
+                overlay.appendChild(filenameText);
+                */
+
+                // Ensamblar y añadir al DOM
+                card.appendChild(img);
+                // card.appendChild(overlay); // Descomentar si se usa el overlay
+                galleryContainer.appendChild(card);
+            });
+        }
+
+        // Iniciar la carga de la galería
+        renderGallery();
+    </script>
+</body>
+</html>
